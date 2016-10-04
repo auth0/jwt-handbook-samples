@@ -1,0 +1,39 @@
+<!doctype html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script src="http://cdn.auth0.com/js/lock/10.3.0/lock.min.js"></script>
+        <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script type="text/javascript" src="http://rawgit.com/auth0/jwt-decode/master/build/jwt-decode.js"></script>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- font awesome from BootstrapCDN -->
+        <link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+        <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+
+
+        <script src="app.js"> </script>
+        <link href="app.css" rel="stylesheet">
+    </head>
+    <body class="home">
+        <div class="container">
+            <div class="login-page clearfix">
+              <div class="login-box auth0-box before">
+                <img src="https://i.cloudup.com/StzWWrY34s.png" />
+                <h3>Auth0 Example</h3>
+                <p>Zero friction identity infrastructure, built for developers</p>
+                <a ng-click="login()" class="btn btn-primary btn-lg btn-login btn-block">SignIn</a>
+              </div>
+              <div class="logged-in-box auth0-box logged-in" style="display: none;">
+                <h1 id="logo"><img src="auth0_logo_final_blue_RGB.png" /></h1>
+                <h2>Welcome to <span class="bold">app1.com</span> <span class="name"></span></h2>
+                <h3 class="url" style="display: none">You wanted to go to <span class="bold"></span></h3>
+                <a href="http://app2.com:3001/">Click here to go to App2</a><br />
+                <a href="http://app3.com:3002/sso">Click here to go to App3</a><br />
+              </div>
+            </div>
+        </div>
+    </body>
+</html>

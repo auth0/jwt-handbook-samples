@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  h3 Add items to shopping cart:
+  form
+    input(type='text', name='item')
+    input(type='submit', value='Add')
+  
+  a(href='/show-cart') See items in shopping cart
+
+  script.
+    initShop();
