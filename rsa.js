@@ -41,7 +41,6 @@ function os2ip(bytes) {
 
     bytes.forEach((b, i) => {
         // result += b * Math.pow(256, bytes.length - 1 - i);
-        //result = result.add(bigInt(b).multiply(bigInt(256).pow(i)));
         result = result.add(
             bigInt(b).multiply(
                 bigInt(256).pow(bytes.length - i - 1)
@@ -86,7 +85,7 @@ function emsaPkcs1v1_5(hashFn, hashType, expectedLength, message) {
 
     const digest = hashFn(message, true);
 
-    // DER is a stricter set of BER, this works:
+    // DER is a stricter set of BER, this (fortunately) works:
     const berWriter = new Ber.Writer();
     berWriter.startSequence();
         berWriter.startSequence();
