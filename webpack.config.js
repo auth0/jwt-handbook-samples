@@ -7,10 +7,14 @@ module.exports = {
         'sha256': ['./sha256.js'],
         'hmac': ['./hmac.js'],
         'hs256': './hs256.js',
+        'rsa': ['./rsa.js'],
+        'rs256': './rs256.js',
     },
     output: {
         path: __dirname + '/dist/',
-        filename: "[name].bundle.js"
+        filename: "[name].js",
+        devtoolModuleFilenameTemplate: "[absolute-resource-path]",
+        devtoolFallbackModuleFilenameTemplate: "[absolute-resource-path]?[hash]" 
     },
     module: {
         loaders: [
@@ -24,5 +28,6 @@ module.exports = {
             }
         ]
     },
-    target: 'node'
+    target: 'node',
+    devtool: "source-map"
 };

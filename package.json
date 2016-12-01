@@ -18,6 +18,8 @@
     "webpack-dev-server": "^1.14.1"
   },
   "dependencies": {
+    "asn1": "^0.2.3",
+    "big-integer": "^1.6.17",
     "jsonwebtoken": "^7.1.7",
     "node-jose": "^0.9.0"
   }
