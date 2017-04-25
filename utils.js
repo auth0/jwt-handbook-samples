@@ -24,20 +24,3 @@ export function uint8ArrayAppend(a, b) {
 
     return result;
 }
-
-export function uint32ArrayToUint8Array(uint32array) {
-    if(!(uint32array instanceof Uint32Array)) {
-        throw new Error("Uint32Array needed");
-    }
-
-    const result = new Uint8Array(uint32array.length * 4);
-    uint32array.forEach((value, index) => {
-        const i = index * 4;
-        result[i    ] = (value >>> 24) & 0xFF;
-        result[i + 1] = (value >>> 16) & 0xFF;
-        result[i + 2] = (value >>> 8)  & 0xFF;
-        result[i + 3] = (value >>> 0)  & 0xFF;
-    });
-
-    return result;
-}

@@ -1,46 +1,136 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var dotenv = require('dotenv');
-var jwt = require('express-jwt');
-var cors = require('cors');
-var http = require('http');
+'use strict';
 
-var routes = require('./routes/index');
+const express = require('express');
+const expressJwt = require('express-jwt');
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const dotenv = require('dotenv');
+const boom = require('express-boom');
+const jwksClient = require('jwks-rsa');
 
-var app = express();
-var router = express.Router();
+const items = require('./static/items.json');
 
-dotenv.load();
+dotenv.config();
 
-var authenticate = jwt({
-  secret: new Buffer(process.env.AUTH0_CLIENT_SECRET, 'base64'),
-  audience: process.env.AUTH0_CLIENT_ID
-});
+const cartVerifyJwtOptions = {
+    algorithms: ['HS256'],
+    maxAge: '1h'
+};
 
-app.use(cors());
-app.use(express.static('public'));
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+const cartSignJwtOptions = {
+    algorithm: 'HS256',
+    expiresIn: '1h'
+};
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(__dirname + '/public/favicon.ico'));
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+const idTokenVerifyJwtOptions = {
+    algorithms: ['RS256']
+};
+
+const jwksOpts = {
+  cache: true,
+  rateLimit: true,
+  jwksUri: `${process.env.AUTH0_API_ISSUER}.well-known/jwks.json`
+};
+const jwks = jwksClient(jwksOpts);
+
+const app = express();
+app.use(boom());
 app.use(cookieParser());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('/secured', authenticate);
-app.use('/', routes);
+app.use('/protected', expressJwt({
+    secret: jwksClient.expressJwtSecret(jwksOpts),
+    issuer: process.env.AUTH0_API_ISSUER,
+    audience: process.env.AUTH0_API_AUDIENCE,
+    requestProperty: 'accessToken',
+    getToken: req => {
+        return req.cookies['access_token'];
+    }
+}));
 
-var port = process.env.PORT || 3001;
+app.use(express.static('static'));
 
-http.createServer(app).listen(port, function (err) {
-  console.log('listening in http://localhost:' + port);
+app.post('/auth', (req, res) => {
+    res.cookie('access_token', req.body.access_token, {
+        httpOnly: true,
+        maxAge: req.body.expires_in * 1000
+    });
+    res.cookie('id_token', req.body.id_token, {
+        maxAge: req.body.expires_in * 1000
+    });
+    res.redirect('/');
 });
 
-module.exports = app;
+app.get('/logout', (req, res) => {
+    res.clearCookie('access_token');
+    res.clearCookie('id_token');
+    res.redirect('/');
+});
+
+function validateId(itemId) {
+    const valid = items.map(i => i.id);
+    return valid.indexOf(itemId) !== -1;
+}
+
+function idValidator(req, res, next) {
+    if(validateId(parseInt(req.query.id))) {
+        next();
+    } else {
+        res.boom.badRequest("Invalid item ID");
+    }
+}
+
+function cartValidator(req, res, next) {
+    if(!req.cookies.cart) {
+        req.cart = { items: [] };
+    } else {
+        try {
+            req.cart = { 
+                items: jwt.verify(req.cookies.cart, 
+                                  process.env.AUTH0_CART_SECRET,
+                                  cartVerifyJwtOptions).items
+            };
+        } catch(e) {
+            req.cart = { items: [] }; 
+        }
+    }
+
+    next();
+}
+
+app.get('/protected/add_item', idValidator, cartValidator, (req, res) => {    
+    req.cart.items.push(parseInt(req.query.id));
+
+    const newCart = jwt.sign(req.cart, 
+                             process.env.AUTH0_CART_SECRET, 
+                             cartSignJwtOptions);
+
+    res.cookie('cart', newCart, {
+        maxAge: 1000 * 60 * 60
+    });
+
+    res.end();
+
+    console.log(`Item ID ${req.query.id} added to cart.`);
+});
+
+function cartToString(cart) {
+    return cart.items.map(
+        id => items.find(item => item.id === id).name).join(', ');
+}
+
+app.get('/protected/purchase', cartValidator, (req, res) => {
+    const idToken = jwt.decode(req.cookies['id_token'], { complete: true });
+    jwks.getSigningKey(idToken.header.kid, (error, key) => {
+        const profile = jwt.verify(req.cookies['id_token'], 
+                                   key.publicKey, 
+                                   idTokenVerifyJwtOptions);
+        const buyMessage = 
+            `User ${profile.name} bought: ${cartToString(req.cart)}`;
+        console.log(buyMessage);
+        res.send(buyMessage);
+    });    
+});
+
+app.listen(3000);

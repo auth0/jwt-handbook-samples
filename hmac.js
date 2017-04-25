@@ -1,6 +1,5 @@
 import sha256 from './sha256.js';
-import { 
-    uint32ArrayToUint8Array, 
+import {
     uint8ArrayAppend as append, 
     stringToUtf8 
 } from './utils.js';
@@ -36,9 +35,7 @@ export default function hmac(hashFn, blockSizeBits, secret, message, returnBytes
 
     // HMAC(message) = H(K' XOR opad || H(K' XOR ipad || message))
     const result = hashFn(
-        append(opadSecret, 
-               uint32ArrayToUint8Array(hashFn(append(ipadSecret, 
-                                                     message), true))), 
+        append(opadSecret, hashFn(append(ipadSecret, message), true)), 
         returnBytes);
 
     return result;

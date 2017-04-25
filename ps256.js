@@ -1,6 +1,6 @@
 import { encode as base64Encode } from './base64.js';
 import sha256 from './sha256.js';
-import { pkcs1v1_5, hashTypes } from './rsassa.js'; 
+import { pss, hashTypes } from './rsassa.js'; 
 import { stringToUtf8 } from './utils.js';
 import bigInt from 'big-integer';
 
@@ -17,15 +17,15 @@ export default function jwtEncode(header, payload, privateKey) {
         throw new Error('header and payload must be objects');
     }
 
-    header.alg = 'RS256';
+    header.alg = 'PS256';
 
     const encHeader = b64(JSON.stringify(header));
     const encPayload = b64(JSON.stringify(payload));
     const jwtUnprotected = `${encHeader}.${encPayload}`;
     const signature = b64(
-        pkcs1v1_5.sign(privateKey, 
-                       msg => sha256(msg, true), 
-                       hashTypes.sha256, stringToUtf8(jwtUnprotected)));
+        pss.sign(privateKey, 
+                 msg => sha256(msg, true), 
+                 hashTypes.sha256, stringToUtf8(jwtUnprotected)));
 
     return `${jwtUnprotected}.${signature}`;
 }

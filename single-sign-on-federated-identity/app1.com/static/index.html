@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/js-cookie@2.1.4"></script>
+    <script src="https://unpkg.com/jwt-decode@2.2.0/build/jwt-decode.min.js"></script>
+    <script src="https://cdn.auth0.com/js/auth0/8.6.0/auth0.min.js"></script>
+</head>
+
+<body>
+    <button id="login-button" type="button">Login</button>
+    <div id="purchase-ui">
+        <h3></h3>
+        <div id="items-view">
+            <select id="items-select">
+            </select>
+            <ul id="cart">
+            </ul>
+        </div>
+        <button id="add-item-button" type="button">Add item</button>
+        <button id="clear-button" type="button">Clear</button>
+        <button id="purchase-button" type="button">Purchase</button>
+        <button id="logout-button" type="button">Logout</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

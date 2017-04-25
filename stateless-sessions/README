@@ -1,0 +1,10 @@
+To run:
+
+Edit the `.env` and `static/script.js` files according to your Auth0 settings, then:
+
+```sh
+npm install
+node app.js
+```
+
+Then browse to [http://localhost:3000](http://localhost:3000).

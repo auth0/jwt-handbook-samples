@@ -7,8 +7,9 @@ module.exports = {
         'sha256': ['./sha256.js'],
         'hmac': ['./hmac.js'],
         'hs256': './hs256.js',
-        'rsa': ['./rsa.js'],
+        'rsassa': ['./rsassa.js'],
         'rs256': './rs256.js',
+        'ps256': './ps256.js'
     },
     output: {
         path: __dirname + '/dist/',

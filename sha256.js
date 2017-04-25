@@ -124,7 +124,16 @@ export default function sha256(message, returnBytes) {
     }
 
     if(returnBytes) {
-        return h_;
+        const result = new Uint8Array(h_.length * 4);
+        h_.forEach((value, index) => {
+            const i = index * 4;
+            result[i    ] = (value >>> 24) & 0xFF;
+            result[i + 1] = (value >>> 16) & 0xFF;
+            result[i + 2] = (value >>> 8)  & 0xFF;
+            result[i + 3] = (value >>> 0)  & 0xFF;
+        });
+
+        return result;
     } else {
         function toHex(n) {
             let str = (n >>> 0).toString(16);
@@ -141,6 +150,8 @@ export default function sha256(message, returnBytes) {
         return result;
     }
 }
+
+sha256.byteLength = 256 / 8;
 
 if(process.env.TEST) {
     const test = 'abc';

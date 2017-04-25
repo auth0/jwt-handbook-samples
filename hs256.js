@@ -1,7 +1,7 @@
 import { encode as base64Encode } from './base64.js';
 import sha256 from './sha256.js';
 import hmac from './hmac.js'; 
-import { stringToUtf8, uint32ArrayToUint8Array } from './utils.js';
+import { stringToUtf8 } from './utils.js';
 
 function b64(data) {
     if(data instanceof Uint8Array) {
@@ -24,8 +24,8 @@ export default function jwtEncode(header, payload, secret) {
     const encHeader = b64(JSON.stringify(header));
     const encPayload = b64(JSON.stringify(payload));
     const jwtUnprotected = `${encHeader}.${encPayload}`;
-    const signature = b64(uint32ArrayToUint8Array(
-        hmac(sha256, 512, secret, stringToUtf8(jwtUnprotected), true)));
+    const signature = 
+        b64(hmac(sha256, 512, secret, stringToUtf8(jwtUnprotected), true));
 
     return `${jwtUnprotected}.${signature}`;
 }

@@ -1,0 +1,22 @@
+[
+    {
+        "id": 0,
+        "name": "iPhone"
+    },
+    {
+        "id": 1,
+        "name": "Galaxy S8"
+    },
+    {
+        "id": 2,
+        "name": "G6"
+    },
+    {
+        "id": 3,
+        "name": "OnePlus 3T"
+    },
+    {
+        "id": 4,
+        "name": "Pixel"
+    }
+]
