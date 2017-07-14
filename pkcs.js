@@ -2,6 +2,7 @@ import bigInt from 'big-integer';
 import { Ber } from 'asn1';
 import * as ASN1 from 'asn1/lib/ber/types.js';
 import crypto from 'crypto';
+import { uint8ArrayEquals } from './utils.js';
 
 import assert from 'assert';
 
@@ -53,6 +54,16 @@ export function rsasp1(privateKey, intMessage) {
 
     // result = intMessage ^ d  (mod n)
     return intMessage.modPow(privateKey.d, privateKey.n);
+}
+
+export function rsavp1(publicKey, intSignature) {
+    if(intSignature.isNegative() || 
+       intSignature.greaterOrEquals(publicKey.n)) {
+        throw new Error("message representative out of range");
+    }
+
+    // result = intSignature ^ e (mod n)
+    return intSignature.modPow(publicKey.e, publicKey.n);
 }
 
 export function emsaPkcs1v1_5(hashFn, hashType, expectedLength, message) {
@@ -131,6 +142,56 @@ export function emsaPssEncode(hashFn,
     masked[0] &= zeroBitsMask;
     
     return Uint8Array.of(...masked, ...digest2, 0xbc);
+}
+
+export function emsaPssVerify(hashFn, 
+                              hashType, 
+                              mgf, 
+                              saltLength, 
+                              expectedLengthBits, 
+                              message,
+                              verificationMessage) {
+    const expectedLength = Math.ceil(expectedLengthBits / 8);
+    
+    const digest1 = hashFn(message, true);
+    if(expectedLength < (digest1.length + saltLength + 2)) {
+        return false;
+    }
+
+    if(verificationMessage.length === 0) {
+        return false;
+    }
+
+    if(verificationMessage[verificationMessage.length - 1] !== 0xBC) {
+        return false;
+    }
+
+    const maskedLength = expectedLength - digest1.length - 1;
+    const masked = verificationMessage.subarray(0, maskedLength);
+    const digest2 = verificationMessage.subarray(maskedLength,
+                                                 maskedLength + digest1.length);
+    
+    const zeroBits = 8 * expectedLength - expectedLengthBits;
+    const zeroBitsMask = 0xFF >>> zeroBits;
+    if((masked[0] & (~zeroBitsMask)) !== 0) {
+        return false;
+    }
+
+    const dbMask = mgf(maskedLength, digest2);
+    const db = masked.map((value, index) => value ^ dbMask[index]);
+    db[0] &= zeroBitsMask;
+
+    const zeroCheckLength = expectedLength - (digest1.length + saltLength + 2);
+    if(!db.subarray(0, zeroCheckLength).every(v => v === 0) || 
+       db[zeroCheckLength] !== 0x01) {
+        return false;
+    }
+
+    const salt = db.subarray(db.length - saltLength);
+    const m = Uint8Array.of(0, 0, 0, 0, 0, 0, 0, 0, ...digest1, ...salt);
+    const expectedDigest = hashFn(m, true);
+
+    return uint8ArrayEquals(digest2, expectedDigest);
 }
 
 if(process.env.TEST) {
