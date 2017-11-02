@@ -153,6 +153,16 @@ export default function sha256(message, returnBytes) {
 
 sha256.byteLength = 256 / 8;
 
+/**
+ * An object specifying the types of hash function accepted by the
+ * sign function.
+ */
+export const hashTypes = Object.freeze({
+    sha256: Symbol('SHA-256')
+});
+
+sha256.hashType = hashTypes.sha256;
+
 if(process.env.TEST) {
     const test = 'abc';
     const testArray = new Uint8Array(test.length);

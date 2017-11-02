@@ -6,13 +6,11 @@ import {
     emsaPkcs1v1_5,
     mgf1,
     emsaPssEncode,
-    emsaPssVerify,
-    hashTypes
+    emsaPssVerify
  } from './pkcs';
+ import { hashTypes } from './sha256.js';
 
 import { uint8ArrayEquals } from './utils.js';
-
-export { hashTypes };
 
 /**
  * Produces a signature for a message using the RSASSA algorithm as defined

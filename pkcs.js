@@ -3,16 +3,9 @@ import { Ber } from 'asn1';
 import * as ASN1 from 'asn1/lib/ber/types.js';
 import crypto from 'crypto';
 import { uint8ArrayEquals } from './utils.js';
+import { hashTypes } from './sha256.js';
 
 import assert from 'assert';
-
-/**
- * An object specifying the types of hash function accepted by the
- * sign function.
- */
-export const hashTypes = Object.freeze({
-    sha256: Symbol('SHA-256')
-});
 
 export function os2ip(bytes) {
     let result = bigInt();

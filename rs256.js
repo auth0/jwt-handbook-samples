@@ -1,6 +1,7 @@
 import * as base64 from './base64.js';
 import sha256 from './sha256.js';
-import { pkcs1v1_5, verifyPkcs1v1_5, hashTypes } from './rsassa.js'; 
+import { hashTypes } from './sha256.js';
+import { pkcs1v1_5, verifyPkcs1v1_5 } from './rsassa.js'; 
 import { stringToUtf8, isString, b64, unb64 } from './utils.js';
 import * as testkey from './testkey.js';
 

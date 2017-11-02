@@ -9,7 +9,8 @@ module.exports = {
         'hs256': './hs256.js',
         'rsassa': ['./rsassa.js'],
         'rs256': './rs256.js',
-        'ps256': './ps256.js'        
+        'ps256': './ps256.js',
+        'es256': './es256.js'
     },
     output: {
         path: __dirname + '/dist/',
